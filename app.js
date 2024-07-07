@@ -1,27 +1,26 @@
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
-import connectDb from "./utils/Db.js";
-
 import bodyParser from "body-parser";
+import dotenv from "dotenv";
+import userRoutes from "./routes/user.js";
+
 const app = express();
+dotenv.config();
 
-app.use(express.json());
-const corsOptions = {
-  origin: `${process.env.FRONTENDLINK}`,
-  methods: "GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS",
-  credentials: true,
-};
-app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use("/user", userRoutes);
+mongoose.set("strictQuery", false);
 
-import router from "./router/auth-router.js";
-const port = process.env.PORT || 4000;
-
-app.use("/api/", router);
-
-connectDb().then(() => {
-  app.listen(port, () => {
-    console.log("running on port " + port);
-  });
-});
+mongoose
+  .connect(process.env.COMPASS_URL)
+  .then(() =>
+    app.listen(process.env.PORT, () =>
+      console.log(`listening at port ${process.env.PORT}`)
+    )
+  )
+  .catch((error) =>
+    console.log({ message: "error in connecting to mongoose DB", error })
+  );
