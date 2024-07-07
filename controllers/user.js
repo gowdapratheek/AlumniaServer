@@ -59,14 +59,14 @@ export const sendRegisterOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
+        user: "gitamapptech@gmail.com",
+        pass: "ajza yvpi ptur jinv",
       },
     });
     const mailOptions = {
-      from: process.env.ALUMNIA,
+      from: process.env.SENDER_EMAIL,
       to: email,
-      subject: "Alumina OTP Verfication for forgot password",
+      subject: "Verification",
       html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
@@ -122,9 +122,9 @@ export const updateUserType = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, otp, usertype } = req.body;
+    const { name, email, password, otp } = req.body;
 
-    if (!name || !email || !password || !otp || !usertype)
+    if (!name || !email || !password || !otp)
       return res.status(400).json({
         message:
           "Please provide all required fields (name, email, password, otp, usertype)",
@@ -163,7 +163,6 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        usertype,
       });
 
       await newUser.generateAuthToken();
@@ -301,15 +300,15 @@ export const sendForgetPasswordOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_EMAIL_PASSWORD,
       },
     });
     const mailOptions = {
-      from: process.env.ALUMNIA,
+      from: process.env.SENDER_EMAIL,
       to: email,
-      subject: "Alumina OTP Verfication for forgot password",
-      html: `<p>Your OTP code is ${otp}</p>`,
+      subject: "Verification",
+      html: `<p>Your OTP code is ${otp}</p>`, // all data to be sent
     };
     transporter.sendMail(mailOptions, function (err, info) {
       if (err) console.log(err);
