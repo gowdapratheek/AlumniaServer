@@ -59,14 +59,14 @@ export const sendRegisterOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "gitamapptech@gmail.com",
-        pass: "ajza yvpi ptur jinv",
+        user: process.env.USER,
+        pass: process.env.PASS,
       },
     });
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+      from: process.env.ALUMNIA,
       to: email,
-      subject: "Verification",
+      subject: "Alumina OTP Verfication for forgot password",
       html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
@@ -88,74 +88,103 @@ export const sendRegisterOTP = async (req, res) => {
   }
 };
 
-export const register = async (req, res) => {
-  try {
-    const { name, email, password, otp } = req.body;
+export const updateUserType = async (req, res) => {
+  const { email, userType } = req.body;
 
-    // Validate input
-    if (!name || !email || !password || !otp) {
-      return res.status(400).json({
-        message: "Please provide all fields (name, email, password, otp)",
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { usertype: userType },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
         success: false,
+        message: "User not found.",
       });
     }
 
-    if (!validator.isEmail(email)) {
+    res.status(200).json({
+      success: true,
+      message: "User type updated successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user type:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error. Failed to update user type.",
+      error: error.message,
+    });
+  }
+};
+
+export const register = async (req, res) => {
+  try {
+    const { name, email, password, otp, usertype } = req.body;
+
+    if (!name || !email || !password || !otp || !usertype)
+      return res.status(400).json({
+        message:
+          "Please provide all required fields (name, email, password, otp, usertype)",
+        success: false,
+      });
+
+    if (!validator.isEmail(email))
       return res.status(400).json({
         message: "Invalid email format. Please provide a valid email.",
         success: false,
       });
-    }
 
-    // Check if email is already registered
     const isEmailAlreadyReg = await User.findOne({ email });
-    if (isEmailAlreadyReg) {
+    if (isEmailAlreadyReg)
       return res.status(400).json({
-        message: `User with email ${email} already registered`,
+        message: `User with email ${email} already registered.`,
         success: false,
       });
-    }
 
-    // Fetch OTP from database
     const otpHolder = await OTP.find({ email });
-    if (otpHolder.length === 0) {
+    if (otpHolder.length == 0)
       return res.status(400).json({
-        message: "You have entered an expired or invalid OTP",
+        message: "Invalid or expired OTP.",
         success: false,
       });
-    }
 
-    // Get the most recent OTP
     const registerOtps = otpHolder.filter((otp) => otp.name === "register_otp");
     const findedOTP = registerOtps[registerOtps.length - 1];
+    const plainOTP = otp;
     const hashedOTP = findedOTP.otp;
+    const isValidOTP = await bcrypt.compare(plainOTP, hashedOTP);
 
-    // Hash password and create user
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
+    if (isValidOTP) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        usertype,
+      });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { email, _id: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-    newUser.tokens.push({ token });
+      await newUser.generateAuthToken();
+      await OTP.deleteMany({ email: findedOTP.email });
+      await newUser.save();
 
-    // Save user to database
-    await newUser.save();
-    await OTP.deleteMany({ email: findedOTP.email });
-
-    return res.status(200).json({
-      result: newUser,
-      message: "Registered successfully",
-      token,
-      success: true,
-    });
+      return res.status(200).json({
+        result: newUser,
+        message: "Registered successfully.",
+        success: true,
+      });
+    } else {
+      return res.status(400).json({
+        message: "Invalid OTP.",
+        success: false,
+      });
+    }
   } catch (error) {
     console.error("Error in register controller:", error);
     res.status(500).json({
-      message: "Error in register - controllers/user.js",
+      message: "Registration failed.",
       error: error.message,
       success: false,
     });
@@ -272,15 +301,15 @@ export const sendForgetPasswordOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: process.env.SENDER_EMAIL,
-        pass: process.env.SENDER_EMAIL_PASSWORD,
+        user: process.env.USER,
+        pass: process.env.PASS,
       },
     });
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+      from: process.env.ALUMNIA,
       to: email,
-      subject: "Verification",
-      html: `<p>Your OTP code is ${otp}</p>`, // all data to be sent
+      subject: "Alumina OTP Verfication for forgot password",
+      html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
       if (err) console.log(err);

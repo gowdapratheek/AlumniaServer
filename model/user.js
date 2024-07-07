@@ -21,6 +21,10 @@ const userSchema = Schema({
     type: [{ name: String, token: String }],
     required: true,
   },
+  usertype: {
+    type: String,
+    default: "Others",
+  },
 });
 
 userSchema.methods.generateAuthToken = async function () {
