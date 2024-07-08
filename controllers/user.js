@@ -59,14 +59,14 @@ export const sendRegisterOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "gitamapptech@gmail.com",
-        pass: "ajza yvpi ptur jinv",
+        user:process.env.USER,
+        pass: process.env.PASS,
       },
     });
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+      from: process.env.ALUMNIA,
       to: email,
-      subject: "Verification",
+      subject: "Alunima OTP Verification",
       html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
@@ -300,15 +300,15 @@ export const sendForgetPasswordOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: process.env.SENDER_EMAIL,
-        pass: process.env.SENDER_EMAIL_PASSWORD,
+        user: process.env.USER,
+        pass: process.env.PASS,
       },
     });
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+      from: process.env.ALUMNIA,
       to: email,
-      subject: "Verification",
-      html: `<p>Your OTP code is ${otp}</p>`, // all data to be sent
+      subject: "Alumnia OTP Verification to reset password",
+      html: `<p>Your OTP code is ${otp}</p>`, 
     };
     transporter.sendMail(mailOptions, function (err, info) {
       if (err) console.log(err);
