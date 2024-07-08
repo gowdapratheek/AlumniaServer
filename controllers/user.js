@@ -1,6 +1,5 @@
 import User from "../model/user.js";
 import OTP from "../model/otp.js";
-
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
@@ -263,6 +262,7 @@ export const login = async (req, res) => {
   }
 };
 
+
 export const sendForgetPasswordOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -277,7 +277,7 @@ export const sendForgetPasswordOTP = async (req, res) => {
     if (!isEmailAlreadyReg)
       return res
         .status(400)
-        .json({ message: `no user exist with email ${email}`, success: false });
+        .json({ message: `No user exist with email ${email}`, success: false });
     if (!validator.isEmail(email))
       return res.status(400).json({
         message: `email pattern failed. Please provide a valid email.`,
