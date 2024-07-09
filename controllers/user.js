@@ -1,5 +1,6 @@
 import User from "../model/user.js";
 import OTP from "../model/otp.js";
+import AlumniPersonalDetails from "../model/alumni.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
@@ -37,7 +38,7 @@ export const sendRegisterOTP = async (req, res) => {
     const isEmailAlreadyReg = await User.findOne({ email });
     // in register user should not be registered already
     if (isEmailAlreadyReg)
-      return res.status(400).json({
+      return res.status(200).json({
         message: `user with email ${email} already resgistered `,
         success: false,
       });
@@ -58,7 +59,7 @@ export const sendRegisterOTP = async (req, res) => {
     var transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user:process.env.USER,
+        user: process.env.USER,
         pass: process.env.PASS,
       },
     });
@@ -75,12 +76,13 @@ export const sendRegisterOTP = async (req, res) => {
 
     res.status(200).json({
       result: newOTP,
+      otp,
       message: "register_otp send successfully",
       success: true,
     });
   } catch (error) {
     res.status(404).json({
-      message: "error in sendRegisterOTP - controllers/user.js",
+      message: "error in sendRegisterOTP  - controllers/user.js",
       error,
       success: false,
     });
@@ -137,8 +139,9 @@ export const register = async (req, res) => {
       });
 
     const isEmailAlreadyReg = await User.findOne({ email });
+    console.log(isEmailAlreadyReg);
     if (isEmailAlreadyReg)
-      return res.status(400).json({
+      return res.status(200).json({
         message: `User with email ${email} already registered.`,
         success: false,
       });
@@ -168,14 +171,20 @@ export const register = async (req, res) => {
       await OTP.deleteMany({ email: findedOTP.email });
       await newUser.save();
 
+      // const userId = newUser._id;
+      // const alumniDetails = new AlumniPersonalDetails({
+      //   alumniId: userId,
+      // });
+      // await alumniDetails.save();
+
       return res.status(200).json({
         result: newUser,
         message: "Registered successfully.",
         success: true,
       });
     } else {
-      return res.status(400).json({
-        message: "Invalid OTP.",
+      return res.status(200).json({
+        message: "Invalid OTP. Try again",
         success: false,
       });
     }
@@ -262,7 +271,6 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const sendForgetPasswordOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -308,7 +316,7 @@ export const sendForgetPasswordOTP = async (req, res) => {
       from: process.env.ALUMNIA,
       to: email,
       subject: "Alumnia OTP Verification to reset password",
-      html: `<p>Your OTP code is ${otp}</p>`, 
+      html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
       if (err) console.log(err);

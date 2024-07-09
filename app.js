@@ -4,6 +4,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.js";
+import alumniRoutes from "./routes/alumni.js";
 
 const app = express();
 dotenv.config();
@@ -11,7 +12,12 @@ dotenv.config();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+
 app.use("/user", userRoutes);
+app.use("/api", alumniRoutes);
+
+
 mongoose.set("strictQuery", false);
 
 mongoose
