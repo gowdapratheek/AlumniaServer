@@ -15,7 +15,7 @@ import {
 router.get("/get-all-users", getAllUsers);
 router.post("/send-register-otp", sendRegisterOTP);
 router.post("/register", register);
-router.put("/login", login);
+router.post("/login", login);
 // router.get("/get-all-posts", hostevent);
 router.post("/send-forget-password-otp", sendForgetPasswordOTP);
 router.put("/change-password", changePassword);
