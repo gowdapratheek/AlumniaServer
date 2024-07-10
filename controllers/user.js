@@ -66,7 +66,7 @@ export const sendRegisterOTP = async (req, res) => {
     const mailOptions = {
       from: process.env.ALUMNIA,
       to: email,
-      subject: "Alunima OTP Verification",
+      subject: "Alumnia OTP Verification",
       html: `<p>Your OTP code is ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, function (err, info) {
@@ -171,11 +171,15 @@ export const register = async (req, res) => {
       await OTP.deleteMany({ email: findedOTP.email });
       await newUser.save();
 
-      // const userId = newUser._id;
-      // const alumniDetails = new AlumniPersonalDetails({
-      //   alumniId: userId,
-      // });
-      // await alumniDetails.save();
+      // Create the entry in AlumniPersonalDetails
+      const newAlumniDetails = new AlumniPersonalDetails({
+        alumniId: newUser._id,
+      });
+      await newAlumniDetails.save();
+
+      // Update the user with the alumniDetailsId
+      newUser.alumniDetailsId = newAlumniDetails._id;
+      await newUser.save();
 
       return res.status(200).json({
         result: newUser,

@@ -25,6 +25,10 @@ const userSchema = Schema({
     type: String,
     default: "Others",
   },
+  alumniDetailsId: {
+    type: Schema.Types.ObjectId,
+    ref: "AlumniPersonalDetails",
+  },
 });
 
 userSchema.methods.generateAuthToken = async function () {

@@ -4,20 +4,20 @@ const alumniPersonalDetailsSchema = Schema({
   alumniId: {
     type: Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    // required: true,
   },
   photo: {
-    type: String,
-    default: null,
+    filename: String,
+    format: String,
+    data: Buffer,
   },
   dob: {
-    type: Date,
-    required: true,
+    type: String,
   },
   gender: {
     type: String,
     // enum: ["Male", "Female", "Other"],
-    required: true,
+    // required: true,
   },
   contact: {
     phoneNumber: { type: Number },
@@ -26,22 +26,34 @@ const alumniPersonalDetailsSchema = Schema({
   },
   companyName: {
     type: String,
-    required: true,
+    // required: true,
   },
   role: {
     type: String,
-    required: true,
+    // required: true,
   },
   locationOfCompany: {
-    address: { type: String, required: true },
-    country: { type: String, required: true },
-    state: { type: String, required: true },
-    pinCode: { type: String, required: true },
+    address: {
+      type: String,
+      // required: true,
+    },
+    country: {
+      type: String,
+      // required: true,
+    },
+    state: {
+      type: String,
+      // required: true,
+    },
+    pinCode: {
+      type: String,
+      // required: true,
+    },
   },
 });
 
 const AlumniPersonalDetails = model(
   "AlumniPersonalDetails",
   alumniPersonalDetailsSchema
-); 
+);
 export default AlumniPersonalDetails;

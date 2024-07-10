@@ -1,12 +1,52 @@
 import AlumniPersonalDetails from "../model/alumni.js";
+import User from "../model/user.js";
 
-// GET all alumni
-export const getAllAlumni = async (req, res) => {
+// GET all alumni details
+export const getAlumniDetails = async (req, res) => {
+  const { email } = req.query;
+
   try {
-    const alumni = await AlumniPersonalDetails.find();
-    res.status(200).json(alumni);
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: `User with email ${email} not found`,
+        success: false,
+      });
+    }
+
+    const alumniDetails = await AlumniPersonalDetails.findById(
+      user.alumniDetailsId
+    );
+
+    if (!alumniDetails) {
+      return res.status(404).json({
+        message: "Alumni details not found",
+        success: false,
+      });
+    }
+
+    // Combine user data and alumniDetails data
+    const combinedData = {
+      user: {
+        email: user.email,
+        name: user.name,
+        userType: user.userType, // Corrected typo: usertype to userType
+      },
+      alumniDetails,
+    };
+
+    res.status(200).json({
+      data: combinedData,
+      message: "Alumni details fetched successfully",
+      success: true,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: "Error fetching alumni details",
+      success: false,
+      error,
+    });
   }
 };
 
@@ -22,23 +62,44 @@ export const createAlumni = async (req, res) => {
   }
 };
 
-// PUT update alumni details
-export const updateAlumni = async (req, res) => {
-  const { id } = req.params;
-  const updatedAlumni = req.body;
+// PUT update alumni details (with file upload handling)
+export const updateAlumniDetails = async (req, res) => {
+  const { email, alumniDetails } = req.body;
 
   try {
-    const alumni = await AlumniPersonalDetails.findByIdAndUpdate(
-      id,
-      updatedAlumni,
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const alumniDetailsId = user.alumniDetailsId;
+
+    // Handle file upload if photo exists in req.file
+    if (req.file) {
+      const photoBase64 = req.file.buffer.toString("base64");
+      alumniDetails.photo = `data:${req.file.mimetype};base64,${photoBase64}`;
+    }
+
+    const updatedDetails = await AlumniPersonalDetails.findByIdAndUpdate(
+      alumniDetailsId,
+      alumniDetails,
       { new: true }
     );
-    if (!alumni) {
-      return res.status(404).json({ message: "Alumni not found" });
-    }
-    res.status(200).json(alumni);
+
+    res.status(200).json({
+      message: "Alumni details updated successfully",
+      success: true,
+      data: updatedDetails,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: "Error updating alumni details",
+      success: false,
+      error,
+    });
   }
 };
 
