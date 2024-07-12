@@ -2,6 +2,51 @@ import AlumniPersonalDetails from "../model/alumni.js";
 import User from "../model/user.js";
 
 // GET all alumni details
+export const getAllAlumniDetails = async (req, res) => {
+  try {
+    // Find all users with userType 'alumni'
+    const alumniUsers = await User.find({ usertype: "Alumni" });
+
+    // Check if any users are found
+    if (alumniUsers.length === 0) {
+      return res.status(404).json({
+        message: "No alumni users found",
+        success: false,
+      });
+    }
+
+    // Fetch alumni details for each user
+    const alumniDetailsList = await Promise.all(
+      alumniUsers.map(async (user) => {
+        const alumniDetails = await AlumniPersonalDetails.findById(
+          user.alumniDetailsId
+        );
+        return {
+          user: {
+            email: user.email,
+            name: user.name,
+            userType: user.userType,
+          },
+          alumniDetails,
+        };
+      })
+    );
+
+    res.status(200).json({
+      data: alumniDetailsList,
+      message: "Alumni details fetched successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching alumni details",
+      success: false,
+      error,
+    });
+  }
+};
+
+
 export const getAlumniDetails = async (req, res) => {
   const { email } = req.query;
 

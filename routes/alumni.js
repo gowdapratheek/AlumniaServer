@@ -5,6 +5,7 @@ import {
   createAlumni,
   updateAlumniDetails,
   deleteAlumni,
+  getAllAlumniDetails,
 } from "../controllers/alumni.js";
 import AlumniPersonalDetails from "../model/alumni.js";
 
@@ -15,6 +16,8 @@ const upload = multer({
 });
 
 // GET all alumni details
+router.get("/all-alumni", getAllAlumniDetails);
+
 router.get("/get-alumni-details", getAlumniDetails);
 
 // POST create a new alumni
