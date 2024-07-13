@@ -18,6 +18,10 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use("/user", userRoutes);
 app.use("/api", alumniRoutes);
 
+import resourceRoutes from "./routes/resource.js";
+app.use("/r", resourceRoutes);
+
+
 
 mongoose.set("strictQuery", false);
 
