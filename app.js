@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.js";
 import alumniRoutes from "./routes/alumni.js";
+import studentRoutes from "./routes/student.js";
 
 const app = express();
 dotenv.config();
@@ -20,6 +21,8 @@ app.use("/api", alumniRoutes);
 
 import resourceRoutes from "./routes/resource.js";
 app.use("/r", resourceRoutes);
+
+app.use("/api", studentRoutes); // Use student routes at /student endpoint
 
 
 
