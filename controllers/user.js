@@ -1,6 +1,7 @@
 import User from "../model/user.js";
 import OTP from "../model/otp.js";
 import AlumniPersonalDetails from "../model/alumni.js";
+import StudentPersonalDetails from "../model/student.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
@@ -106,6 +107,31 @@ export const updateUserType = async (req, res) => {
       });
     }
 
+    let newDetails;
+    console.log(userType);
+
+    if (userType === "Alumni") {
+      console.log(userType);
+      // Create the entry in AlumniPersonalDetails
+      newDetails = new AlumniPersonalDetails({
+        alumniId: updatedUser._id,
+      });
+      await newDetails.save();
+      // Update the user with the alumniDetailsId
+      updatedUser.alumniDetailsId = newDetails._id;
+    } else if (userType === "Student") {
+      console.log(userType);
+      // Create the entry in StudentPersonalDetails
+      newDetails = new StudentPersonalDetails({
+        studentId: updatedUser._id,
+      });
+      await newDetails.save();
+      // Update the user with the studentDetailsId
+      updatedUser.studentDetailsId = newDetails._id;
+    }
+
+    await updatedUser.save();
+
     res.status(200).json({
       success: true,
       message: "User type updated successfully.",
@@ -171,15 +197,15 @@ export const register = async (req, res) => {
       await OTP.deleteMany({ email: findedOTP.email });
       await newUser.save();
 
-      // Create the entry in AlumniPersonalDetails
-      const newAlumniDetails = new AlumniPersonalDetails({
-        alumniId: newUser._id,
-      });
-      await newAlumniDetails.save();
+      // // Create the entry in AlumniPersonalDetails
+      // const newAlumniDetails = new AlumniPersonalDetails({
+      //   alumniId: newUser._id,
+      // });
+      // await newAlumniDetails.save();
 
-      // Update the user with the alumniDetailsId
-      newUser.alumniDetailsId = newAlumniDetails._id;
-      await newUser.save();
+      // // Update the user with the alumniDetailsId
+      // newUser.alumniDetailsId = newAlumniDetails._id;
+      // await newUser.save();
 
       return res.status(200).json({
         result: newUser,
@@ -234,7 +260,7 @@ export const login = async (req, res) => {
       existingUser.password
     );
     if (!isPasswordCorrect) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "Invalid credentials.",
         success: false,
       });
@@ -259,6 +285,7 @@ export const login = async (req, res) => {
 
     existingUser.tokens.push({ name: auth_token, token });
     const result = await existingUser.save();
+    
 
     res.status(200).json({
       result,

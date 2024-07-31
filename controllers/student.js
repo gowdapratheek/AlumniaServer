@@ -5,7 +5,7 @@ import User from "../model/user.js";
 export const getAllStudentDetails = async (req, res) => {
   try {
     // Find all users with userType 'student'
-    const studentUsers = await User.find({ userType: "Student" });
+    const studentUsers = await User.find({ usertype: "Student" });
 
     // Check if any users are found
     if (studentUsers.length === 0) {
@@ -109,7 +109,6 @@ export const createStudent = async (req, res) => {
 // PUT update student details (with file upload handling)
 export const updateStudentDetails = async (req, res) => {
   const { email, studentDetails } = req.body;
-  console.log(email, studentDetails);
 
   try {
     const user = await User.findOne({ email });

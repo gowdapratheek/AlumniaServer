@@ -29,6 +29,10 @@ const userSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: "AlumniPersonalDetails",
   },
+  studentDetailsId: {
+    type: Schema.Types.ObjectId,
+    ref: "StudentPersonalDetails",
+  },
 });
 
 userSchema.methods.generateAuthToken = async function () {

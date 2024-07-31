@@ -107,6 +107,7 @@ export const createAlumni = async (req, res) => {
   }
 };
 
+
 // PUT update alumni details (with file upload handling)
 export const updateAlumniDetails = async (req, res) => {
   const { email, alumniDetails } = req.body;

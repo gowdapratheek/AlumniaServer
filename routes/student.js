@@ -16,7 +16,7 @@ const upload = multer({
 });
 
 // GET all student details
-router.get("/all-students", getAllStudentDetails);
+router.get("/all-student", getAllStudentDetails);
 
 router.get("/get-student-details", getStudentDetails);
 

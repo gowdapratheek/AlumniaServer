@@ -24,29 +24,31 @@ const studentPersonalDetailsSchema = Schema({
     github: { type: String },
     linkedin: { type: String },
   },
-  courseName: {
+  companyName: {
     type: String,
     // required: true,
   },
-  yearOfStudy: {
+  role: {
     type: String,
     // required: true,
   },
-  address: {
-    type: String,
-    // required: true,
-  },
-  country: {
-    type: String,
-    // required: true,
-  },
-  state: {
-    type: String,
-    // required: true,
-  },
-  pinCode: {
-    type: String,
-    // required: true,
+  locationOfCompany: {
+    address: {
+      type: String,
+      // required: true,
+    },
+    country: {
+      type: String,
+      // required: true,
+    },
+    state: {
+      type: String,
+      // required: true,
+    },
+    pinCode: {
+      type: String,
+      // required: true,
+    },
   },
 });
 
